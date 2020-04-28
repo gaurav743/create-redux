@@ -8,7 +8,7 @@
     4) Update state
 */
 
-function createStore(todos){
+function createStore(reducer){
     //state tree.
     let state
 
@@ -27,7 +27,7 @@ function createStore(todos){
     }
 
     const dispatch = (action) => { //dispatch function is responsible for updating the state of the store. It takes action as the argument.
-        state = todos(state, action)
+        state = reducer(state, action)
         listeners.forEach((listener) => listener()) //Once, state is updated all listeners must be notified. In this case we are invoking
                                                     //all listeners as they are functions.
     }
@@ -44,26 +44,17 @@ function createStore(todos){
 /////////////////////////User Invoked Code /////////////////////////////////////////////
 
 //Instantiate store
-const store = createStore(todos)
+const store = createStore(app)
 
 //Listner 1
 store.subscribe( () => {
     console.log("The new state is", store.getState())
 })
 
-store.dispatch({
-    type: 'ADD_TODO',
-    todo: {
-        id: 1,
-        name: 'Learn React',
-        completed: false
-    }
-})
 //Listener 2. unsubscribe will store function to unsubscribe as variable.
 const unsubscribe = store.subscribe( setTimeout (() => {
     console.log("The state is updated.....")
 }, 100))
-
 
 
 //This will invoke the anonymous function and will remove listener 2 from the array of listeners from store.
@@ -73,12 +64,102 @@ unsubscribe()
 //Reducer TODOS function. A reducer function takes a state and action that will modify the state and return modified state.
 //A reducer must be a pure function.
 function todos(state = [], action){
-    if(action.type === 'ADD_TODO'){
-        return state.concat(action.todo)
+    switch(action.type){
+        case 'ADD_TODO':
+            return state.concat(action.todo)
+        case 'REMOVE_TODO':
+            return state.filter( todo => todo.id != action.id)
+        case 'TOGGLE_TODO':
+            return state.map( todo => todo.id != action.id ? todo : Object.assign({}, todo, { completed: !todo.completed }))
+        default:
+            return state
     }
-
-    return state
 }
+
+function goals(state = [], action){
+    switch(action.type){
+        case 'ADD_GOAL':
+            return state.concat(action.goal)
+        case 'REMOVE_TODO':
+            return state.filter( goal => goal.id !== action.id)
+        default:
+            return state
+    }
+}
+
+function app(state = {}, action){ //We need to pass default empty object so that when we are calling this for the first time.
+                                  // state.todos and state.goals will be undefined and will be assigned empty array as []
+                                  //If we do not assign empty object here the code will break.
+    return{
+        todos: todos(state.todos, action),
+        goals: goals(state.goals, action)
+    }
+}
+
+
+//////////////////////Test with dispatches///////////////////////////////////////
+store.dispatch({
+    type: 'ADD_TODO',
+    todo: {
+        id: 1,
+        name: 'Learn React',
+        completed: false
+    }
+})
+
+
+store.dispatch({
+    type: 'ADD_TODO',
+    todo: {
+        id: 2,
+        name: 'Learn Redux',
+        completed: false
+    }
+})
+
+
+store.dispatch({
+    type: 'ADD_TODO',
+    todo: {
+        id: 3,
+        name: 'Learn React Native',
+        completed: false
+    }
+})
+
+store.dispatch({
+    type: 'ADD_GOAL',
+    goal: {
+        id: 1,
+        name: 'Learn Technical Analysis'
+    }
+})
+
+store.dispatch({
+    type: 'ADD_GOAL',
+    goal: {
+        id: 2,
+        name: 'Get a stellar job'
+    }
+})
+
+store.dispatch({
+    type: 'REMOVE_TODO',
+    id: 2
+})
+
+store.dispatch({
+    type: 'TOGGLE_TODO',
+    id: 3
+})
+
+store.dispatch({
+    type: 'REMOVE_GOAL',
+    id: 2
+})
+
+
+////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////User Invoked Code /////////////////////////////////////////////
 
