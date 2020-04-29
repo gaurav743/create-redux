@@ -78,8 +78,8 @@ function todos(state = [], action){
 
 function goals(state = [], action){
     switch(action.type){
-        case 'ADD_GOAL':
-            return state.concat(action.goal)
+        case  'ADD_GOAL': 
+            return state.concat(action.goal)                                                                                    
         case 'REMOVE_TODO':
             return state.filter( goal => goal.id !== action.id)
         default:
@@ -98,66 +98,91 @@ function app(state = {}, action){ //We need to pass default empty object so that
 
 
 //////////////////////Test with dispatches///////////////////////////////////////
-store.dispatch({
-    type: 'ADD_TODO',
-    todo: {
+
+//Using constants instead of strings.
+const ADD_TODO = 'ADD_TODO'
+const REMOVE_TODO = 'REMOVE_TODO'
+const TOGGLE_TODO = 'TOGGLE_TODO'
+const ADD_GOAL = 'ADD_GOAL'
+const REMOVE_GOAL = 'REMOVE_GOAL'
+
+//Creating functions for all the actions...
+function addTodoAction(todo){
+    return{
+        type: ADD_TODO,
+        todo
+    }
+}
+
+function toggleTodoAction(id){
+    return{
+        type: TOGGLE_TODO,
+        id
+    }
+}
+
+function removeTodoAction(id){
+    return{
+        type: REMOVE_TODO,
+        id
+    }
+}
+
+function addGoalAction(goal){
+    return{
+        type: ADD_GOAL,
+        goal
+    }
+}
+
+function removeGoalAction(id){
+    return{
+        type: REMOVE_GOAL,
+        id
+    }
+}
+
+store.dispatch(addTodoAction(
+    {
         id: 1,
         name: 'Learn React',
         completed: false
     }
-})
+))
 
 
-store.dispatch({
-    type: 'ADD_TODO',
-    todo: {
+store.dispatch(addTodoAction(
+    {
         id: 2,
         name: 'Learn Redux',
         completed: false
     }
-})
+))
 
 
-store.dispatch({
-    type: 'ADD_TODO',
-    todo: {
-        id: 3,
-        name: 'Learn React Native',
-        completed: false
-    }
-})
+store.dispatch(addTodoAction({
+    id: 3,
+    name: 'Learn React Native',
+    completed: false
+}))
 
-store.dispatch({
-    type: 'ADD_GOAL',
-    goal: {
+store.dispatch(addGoalAction({
         id: 1,
         name: 'Learn Technical Analysis'
     }
-})
+))
 
-store.dispatch({
-    type: 'ADD_GOAL',
-    goal: {
+store.dispatch(addGoalAction({
         id: 2,
         name: 'Get a stellar job'
     }
-})
+))
 
-store.dispatch({
-    type: 'REMOVE_TODO',
-    id: 2
-})
+store.dispatch(removeTodoAction(2))
 
-store.dispatch({
-    type: 'TOGGLE_TODO',
-    id: 3
-})
+store.dispatch(toggleTodoAction(3))
 
-store.dispatch({
-    type: 'REMOVE_GOAL',
-    id: 2
-})
-
+store.dispatch(removeGoalAction(2))
 
 ////////////////////////////////////////////////////////////////////////////////
 
