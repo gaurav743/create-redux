@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Todo Goals App</title>
+</head>
+<body>
+    <div>
+        <h1>TODOS</h1>
+        <input id = "todoInput" type="text" placeholder = "Enter todo name">
+        <button id = "todoBtn">Add Todo</button>
+        <ul id="todoList"></ul>
+    </div>
+
+    <div>
+        <h1>GOAL</h1>
+        <input id = "goalInput" type="text" placeholder = "Enter goal name">
+        <button id = "goalBtn">Add Goal</button>
+        <ul id="goalList"></ul>
+    </div>
+</body>
+
+<script type="text/javascript">
+    const ADD_TODO = 'ADD_TODO'
+    const REMOVE_TODO = 'REMOVE_TODO'
+    const TOGGLE_TODO = 'TOGGLE_TODO'
+    const ADD_GOAL = 'ADD_GOAL'
+    const REMOVE_GOAL = 'REMOVE_GOAL'
+
+    function addTodoAction(todo){
+        return{
+            type: ADD_TODO,
+            todo
+        }
+    }
+
+    function toggleTodoAction(id){
+        return{
+            type: TOGGLE_TODO,
+            id
+        }
+    }
+
+    function removeTodoAction(id){
+        return{
+            type: REMOVE_TODO,
+            id
+        }
+    }
+
+    function addGoalAction(goal){
+        return{
+            type: ADD_GOAL,
+            goal
+        }
+    }
+
+    function removeGoalAction(id){
+        return{
+            type: REMOVE_GOAL,
+            id
+        }
+    }
+
+    function createStore(reducer){
+        let state
+        let listeners = []
+
+        const getState = () => state
+        
+        const subscribe = (listener) => {
+            listeners.push(listener)
+            return () => listeners = listeners.filter( l => l != listener )
+        }
+
+        const dispatch = (action) => { 
+            state = reducer(state, action)
+            listeners.forEach((listener) => listener()) 
+        }
+
+        return {
+            getState,
+            subscribe,
+            dispatch
+        }
+    }
+
+    const store = createStore(app)
+
+    store.subscribe( () => {
+        console.log("The new state is", store.getState())
+    })
+
+    const unsubscribe = store.subscribe( setTimeout (() => {
+        console.log("The state is updated.....")
+    }, 100))
+
+    unsubscribe()
+
+    function todos(state = [], action){
+        switch(action.type){
+            case ADD_TODO:
+                return state.concat(action.todo)
+            case REMOVE_TODO:
+                return state.filter( todo => todo.id != action.id)
+            case TOGGLE_TODO:
+                return state.map( todo => todo.id != action.id ? todo : Object.assign({}, todo, { completed: !todo.completed }))
+            default:
+                return state
+        }
+    }
+
+    function goals(state = [], action){
+        switch(action.type){
+            case  ADD_GOAL: 
+                return state.concat(action.goal)                                                                                    
+            case REMOVE_TODO:
+                return state.filter( goal => goal.id !== action.id)
+            default:
+                return state
+        }
+    }
+
+    function app(state = {}, action){ 
+        return{
+            todos: todos(state.todos, action),
+            goals: goals(state.goals, action)
+        }
+    }
+
+    const addTodoButton = document.getElementById('todoBtn')
+    const addGoalButton = document.getElementById('goalBtn')
+    addTodoButton.addEventListener('click', addTodoItem)
+    addGoalButton.addEventListener('click', addGoalItem)
+
+    //generates unique id.
+    function generateID() {
+        return '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function addTodoItem(){
+        const todoInput = document.getElementById('todoInput')
+        const todoName = todoInput.value
+        todoInput.value = ''
+
+        store.dispatch(addTodoAction({
+            id: generateID(),
+            name: todoName,
+            completed: false
+        }))
+    }
+
+    function addGoalItem(){
+        const goalInput = document.getElementById('goalInput')
+        const goalName = goalInput.value
+        goalInput.value = ''
+
+        store.dispatch(addGoalAction({
+            id: generateID(),
+            name: goalName
+        }))
+    }
+
+    // store.dispatch(addTodoAction(
+    //     {
+    //         id: 1,
+    //         name: 'Learn React',
+    //         completed: false
+    //     }
+    // ))
+
+
+    // store.dispatch(addTodoAction(
+    //     {
+    //         id: 2,
+    //         name: 'Learn Redux',
+    //         completed: false
+    //     }
+    // ))
+
+
+    // store.dispatch(addTodoAction({
+    //     id: 3,
+    //     name: 'Learn React Native',
+    //     completed: false
+    // }))
+
+    // store.dispatch(addGoalAction({
+    //         id: 1,
+    //         name: 'Learn Technical Analysis'
+    //     }
+    // ))
+
+    // store.dispatch(addGoalAction({
+    //         id: 2,
+    //         name: 'Get a stellar job'
+    //     }
+    // ))
+
+    // store.dispatch(removeTodoAction(2))
+
+    // store.dispatch(toggleTodoAction(3))
+
+    // store.dispatch(removeGoalAction(2))
+
+</script>
+</html>
