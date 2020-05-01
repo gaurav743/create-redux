@@ -89,7 +89,35 @@
 
     store.subscribe( () => {
         console.log("The new state is", store.getState())
+        const { todos, goals } = store.getState()
+
+        const todosList = document.getElementById('todoList')
+        const goalsList = document.getElementById('goalList')
+        
+        todosList.innerHTML = ''
+        goalsList.innerHTML = ''
+
+        todos.forEach( (todo) => {
+            addTodoToDOM(todosList, todo)
+        })
+
+        goals.forEach( (goal) => {
+            addGoalToDOM(goalsList, goal)
+        })
+
     })
+
+    const addTodoToDOM = (todosList, todo) => {
+        const todoListItem = document.createElement("li")
+        todoListItem.innerText = todo.name
+        todosList.appendChild(todoListItem)
+    }
+
+    const addGoalToDOM = (goalsList, goal) => {
+        const goalListItem = document.createElement("li")
+        goalListItem.innerText = goal.name
+        goalsList.appendChild(goalListItem)
+    }
 
     const unsubscribe = store.subscribe( setTimeout (() => {
         console.log("The state is updated.....")
