@@ -89,6 +89,8 @@
 
     store.subscribe( () => {
         console.log("The new state is", store.getState())
+
+        //We will be generating our list from subscribe as it has latest data.
         const { todos, goals } = store.getState()
 
         const todosList = document.getElementById('todoList')
@@ -107,9 +109,25 @@
 
     })
 
+
     const addTodoToDOM = (todosList, todo) => {
         const todoListItem = document.createElement("li")
         todoListItem.innerText = todo.name
+
+        //CSS to strike through a todo item if task is not completed.
+        todoListItem.style.textDecoration  =  todo.completed ? 'none' : 'line-through'
+        todoListItem.addEventListener('click', () => {
+            store.dispatch(toggleTodoAction(todo.id))
+        })
+
+        //CSS to add remove button while creating a todo item.
+        const removeTodoButton = document.createElement('button')
+        removeTodoButton.innerHTML = 'X'
+        removeTodoButton.addEventListener('click', () => {
+            store.dispatch(removeTodoAction(todo.id))
+        })
+        todoListItem.appendChild(removeTodoButton)
+
         todosList.appendChild(todoListItem)
     }
 
@@ -117,6 +135,14 @@
         const goalListItem = document.createElement("li")
         goalListItem.innerText = goal.name
         goalsList.appendChild(goalListItem)
+
+        //CSS to add remove button while creating a goal item.
+        const removeGoalButton = document.createElement('button')
+        removeGoalButton.innerHTML = 'X'
+        removeGoalButton.addEventListener('click', () => {
+            store.dispatch(removeGoalAction(goal.id))
+        })
+        goalListItem.appendChild(removeGoalButton)
     }
 
     const unsubscribe = store.subscribe( setTimeout (() => {
@@ -142,7 +168,7 @@
         switch(action.type){
             case  ADD_GOAL: 
                 return state.concat(action.goal)                                                                                    
-            case REMOVE_TODO:
+            case REMOVE_GOAL:
                 return state.filter( goal => goal.id !== action.id)
             default:
                 return state
@@ -188,48 +214,6 @@
             name: goalName
         }))
     }
-
-    // store.dispatch(addTodoAction(
-    //     {
-    //         id: 1,
-    //         name: 'Learn React',
-    //         completed: false
-    //     }
-    // ))
-
-
-    // store.dispatch(addTodoAction(
-    //     {
-    //         id: 2,
-    //         name: 'Learn Redux',
-    //         completed: false
-    //     }
-    // ))
-
-
-    // store.dispatch(addTodoAction({
-    //     id: 3,
-    //     name: 'Learn React Native',
-    //     completed: false
-    // }))
-
-    // store.dispatch(addGoalAction({
-    //         id: 1,
-    //         name: 'Learn Technical Analysis'
-    //     }
-    // ))
-
-    // store.dispatch(addGoalAction({
-    //         id: 2,
-    //         name: 'Get a stellar job'
-    //     }
-    // ))
-
-    // store.dispatch(removeTodoAction(2))
-
-    // store.dispatch(toggleTodoAction(3))
-
-    // store.dispatch(removeGoalAction(2))
 
 </script>
 </html>
